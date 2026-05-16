@@ -2,7 +2,7 @@ import streamlit as st
 import json
 import os
 
-st.set_page_config(page_title="0050風險評估", page_icon="📊", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="0050 每日風險快篩", page_icon="📊", layout="wide", initial_sidebar_state="collapsed")
 
 st.markdown("""
 <style>
@@ -39,35 +39,36 @@ else:
     with open(JSON_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)
 
-    st.markdown("<div class='dashboard-title'>📊 0050風險評估系統</div>", unsafe_allow_html=True)
-    st.markdown(f"<div class='update-time'>📡 指標更新時間：{data['update_time']} (已排除交易日外非開盤數據)</div>", unsafe_allow_html=True)
+    # 【全面白話文修改：看板標題與小標】
+    st.markdown("<div class='dashboard-title'>📊 0050 每日風險快篩</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='update-time'>📡 最新資料時間：{data['update_time']} (週末假日不更新喔！)</div>", unsafe_allow_html=True)
     
     col1, col2 = st.columns([1.2, 1], gap="large")
     
     with col1:
-        st.markdown("<h4 style='color: #FFFFFF; font-weight: 600; margin-bottom: 15px;'>📈 市場價格防線</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='color: #FFFFFF; font-weight: 600; margin-bottom: 15px;'>📈 目前股價狀況</h4>", unsafe_allow_html=True)
         m1, m2, m3 = st.columns(3)
-        m1.markdown(f"<div class='metric-card'><div class='metric-title'>還原收盤價</div><div class='metric-value'>{data['price_data']['current_price']}</div></div>", unsafe_allow_html=True)
+        m1.markdown(f"<div class='metric-card'><div class='metric-title'>今天收盤價</div><div class='metric-value'>{data['price_data']['current_price']}</div></div>", unsafe_allow_html=True)
         m2.markdown(f"<div class='metric-card'><div class='metric-title'>月線 (20MA)</div><div class='metric-value'>{data['price_data']['ma20']}</div></div>", unsafe_allow_html=True)
-        m3.markdown(f"<div class='metric-card'><div class='metric-title'>波段最高點</div><div class='metric-value'>{data['price_data']['high_water_mark']}</div></div>", unsafe_allow_html=True)
+        m3.markdown(f"<div class='metric-card'><div class='metric-title'>最近的高點</div><div class='metric-value'>{data['price_data']['high_water_mark']}</div></div>", unsafe_allow_html=True)
         
-        st.markdown("<br><h4 style='color: #FFFFFF; font-weight: 600; margin-bottom: 15px;'>🛡️ 關鍵風控指標</h4>", unsafe_allow_html=True)
+        st.markdown("<br><h4 style='color: #FFFFFF; font-weight: 600; margin-bottom: 15px;'>🛡️ 三大危險訊號檢查</h4>", unsafe_allow_html=True)
         
         def check_status(is_triggered, text):
             icon = "🔴" if is_triggered else "🟢"
             color = "#F87171" if is_triggered else "#34D399"
             return f"<div class='checklist-item'><span class='checklist-icon'>{icon}</span><span style='color: {color};'>{text}</span></div>"
             
-        st.markdown(check_status(data['locks']['env_risk'], "總體環境風險過高 (籌碼與總經評分 ≥ 85)"), unsafe_allow_html=True)
-        st.markdown(check_status(data['locks']['trend_broken'], "中期趨勢轉弱 (收盤價跌破月線)"), unsafe_allow_html=True)
-        st.markdown(check_status(data['locks']['damage_taken'], f"波段回撤幅度超標 (自高點回撤 ≥ 7%，目前 {data['price_data']['drawdown_pct']}%)"), unsafe_allow_html=True)
+        st.markdown(check_status(data['locks']['env_risk'], "大環境亮紅燈 (總經與籌碼分數 ≥ 85)"), unsafe_allow_html=True)
+        st.markdown(check_status(data['locks']['trend_broken'], "跌破月線了 (今天收盤價 < 月線)"), unsafe_allow_html=True)
+        st.markdown(check_status(data['locks']['damage_taken'], f"跌得有點多 (從高點跌下來超過 7%，現在跌了 {data['price_data']['drawdown_pct']}%)"), unsafe_allow_html=True)
 
     with col2:
-        st.markdown("<h4 style='text-align: center; color: #FFFFFF; font-weight: 600;'>🎯 綜合風險評級</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='text-align: center; color: #FFFFFF; font-weight: 600;'>🎯 今天的風險分數</h4>", unsafe_allow_html=True)
         st.markdown(f"""
             <div class='score-card'>
                 <p class='score-value' style='color: {data['bg_color']};'>{data['risk_score']}</p>
-                <p style='color: #9CA3AF; font-size: 1.1rem; margin-top: 10px; letter-spacing: 1px;'>RISK INDEX (MAX: 100)</p>
+                <p style='color: #9CA3AF; font-size: 1.1rem; margin-top: 10px; letter-spacing: 1px;'>(滿分 100 分，越高越危險)</p>
             </div>
         """, unsafe_allow_html=True)
         st.progress(data['risk_score'] / 100)
