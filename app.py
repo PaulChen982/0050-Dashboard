@@ -25,9 +25,6 @@ st.markdown("""
     
     .score-card { text-align: center; padding: 25px 0; }
     .score-value { font-size: 6.5rem; font-weight: 800; line-height: 1; margin: 0; }
-    
-    .checklist-item { font-size: 1.15rem; margin: 15px 0; display: flex; align-items: center; font-weight: 500; }
-    .checklist-icon { font-size: 1.4rem; margin-right: 12px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -39,7 +36,6 @@ else:
     with open(JSON_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)
 
-    # 【全面白話文修改：看板標題與小標】
     st.markdown("<div class='dashboard-title'>📊 0050 每日風險快篩</div>", unsafe_allow_html=True)
     st.markdown(f"<div class='update-time'>📡 最新資料時間：{data['update_time']} (週末假日不更新喔！)</div>", unsafe_allow_html=True)
     
@@ -54,14 +50,39 @@ else:
         
         st.markdown("<br><h4 style='color: #FFFFFF; font-weight: 600; margin-bottom: 15px;'>🛡️ 三大危險訊號檢查</h4>", unsafe_allow_html=True)
         
-        def check_status(is_triggered, text):
+        # 【全新設計】加入灰色輔助說明文字的排版函數
+        def check_status(is_triggered, title, description):
             icon = "🔴" if is_triggered else "🟢"
             color = "#F87171" if is_triggered else "#34D399"
-            return f"<div class='checklist-item'><span class='checklist-icon'>{icon}</span><span style='color: {color};'>{text}</span></div>"
+            return f"""
+            <div style='margin: 18px 0;'>
+                <div style='display: flex; align-items: center; font-size: 1.15rem; font-weight: 500;'>
+                    <span style='font-size: 1.4rem; margin-right: 12px;'>{icon}</span>
+                    <span style='color: {color};'>{title}</span>
+                </div>
+                <div style='font-size: 0.85rem; color: #9CA3AF; margin-left: 36px; margin-top: 4px; line-height: 1.4;'>
+                    {description}
+                </div>
+            </div>
+            """
             
-        st.markdown(check_status(data['locks']['env_risk'], "大環境亮紅燈 (總經與籌碼分數 ≥ 85)"), unsafe_allow_html=True)
-        st.markdown(check_status(data['locks']['trend_broken'], "跌破月線了 (今天收盤價 < 月線)"), unsafe_allow_html=True)
-        st.markdown(check_status(data['locks']['damage_taken'], f"跌得有點多 (從高點跌下來超過 7%，現在跌了 {data['price_data']['drawdown_pct']}%)"), unsafe_allow_html=True)
+        st.markdown(check_status(
+            data['locks']['env_risk'], 
+            "環境風險過高 (總經與籌碼分數 ≥ 85)", 
+            "綜合評估外資籌碼與國際總經等6項核心指標。達85分代表發生系統性崩跌的機率極高。"
+        ), unsafe_allow_html=True)
+        
+        st.markdown(check_status(
+            data['locks']['trend_broken'], 
+            "短期趨勢轉弱 (收盤價跌破月線)", 
+            "月線(20MA)為短線生命線。跌破代表近一個月買盤套牢，多頭趨勢轉弱，需提高警覺。"
+        ), unsafe_allow_html=True)
+        
+        st.markdown(check_status(
+            data['locks']['damage_taken'], 
+            f"波段回檔過深 (自高點回跌超過 7%，目前僅 {data['price_data']['drawdown_pct']}%)", 
+            "0050正常洗盤震盪約在3~5%內。回檔一旦超過7%，通常代表市場引發實質恐慌與多殺多。"
+        ), unsafe_allow_html=True)
 
     with col2:
         st.markdown("<h4 style='text-align: center; color: #FFFFFF; font-weight: 600;'>🎯 今天的風險分數</h4>", unsafe_allow_html=True)
