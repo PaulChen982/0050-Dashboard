@@ -10,7 +10,8 @@ st.markdown("""
     div[data-testid="stHeader"] { display: none; }
     
     .dashboard-title { font-size: 2.2rem; font-weight: 700; color: #FFFFFF; letter-spacing: -0.5px; margin-bottom: -5px; }
-    .update-time { font-size: 0.85rem; color: #9CA3AF; margin-bottom: 30px; }
+    .update-time { font-size: 0.9rem; color: #9CA3AF; margin-bottom: 30px; }
+    .highlight-date { color: #38BDF8; font-weight: 600; }
     
     .metric-card {
         background-color: #1F2937;
@@ -35,25 +36,27 @@ if not os.path.exists(JSON_FILE):
 else:
     with open(JSON_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)
+        
+    # 防止舊版 JSON 尚未更新時找不到 last_trading_date 報錯
+    trading_date = data.get('last_trading_date', '更新中...')
 
     st.markdown("<div class='dashboard-title'>📊 0050 每日風險快篩</div>", unsafe_allow_html=True)
-    st.markdown(f"<div class='update-time'>📡 最新資料時間：{data['update_time']} (週末假日不更新喔！)</div>", unsafe_allow_html=True)
+    # 【完美優化】：清楚標示股價的真實日期
+    st.markdown(f"<div class='update-time'>系統結算時間：{data['update_time']} ｜ 📊 股價基準日：<span class='highlight-date'>{trading_date}</span></div>", unsafe_allow_html=True)
     
     col1, col2 = st.columns([1.2, 1], gap="large")
     
     with col1:
         st.markdown("<h4 style='color: #FFFFFF; font-weight: 600; margin-bottom: 15px;'>📈 目前股價狀況</h4>", unsafe_allow_html=True)
         m1, m2, m3 = st.columns(3)
-        m1.markdown(f"<div class='metric-card'><div class='metric-title'>今天收盤價</div><div class='metric-value'>{data['price_data']['current_price']}</div></div>", unsafe_allow_html=True)
+        m1.markdown(f"<div class='metric-card'><div class='metric-title'>收盤價</div><div class='metric-value'>{data['price_data']['current_price']}</div></div>", unsafe_allow_html=True)
         m2.markdown(f"<div class='metric-card'><div class='metric-title'>月線 (20MA)</div><div class='metric-value'>{data['price_data']['ma20']}</div></div>", unsafe_allow_html=True)
         m3.markdown(f"<div class='metric-card'><div class='metric-title'>最近的高點</div><div class='metric-value'>{data['price_data']['high_water_mark']}</div></div>", unsafe_allow_html=True)
         
         st.markdown("<br><h4 style='color: #FFFFFF; font-weight: 600; margin-bottom: 15px;'>🛡️ 三大危險訊號檢查</h4>", unsafe_allow_html=True)
         
-        # 【全新設計】加入「基準值 vs 現況」的動態數據面板
         def check_status(is_triggered, title, description, baseline_text, current_text):
             icon = "🔴" if is_triggered else "🟢"
-            # 觸發時外框與文字亮紅燈，安全時亮綠燈
             color = "#EF4444" if is_triggered else "#10B981"
             
             return f"""
