@@ -1,0 +1,17 @@
+{
+    "update_time": "2026-05-16 11:17:54",
+    "price_data": {
+        "current_price": NaN,
+        "ma20": NaN,
+        "high_water_mark": 97.7,
+        "drawdown_pct": NaN
+    },
+    "risk_score": 80,
+    "locks": {
+        "env_risk": false,
+        "trend_broken": false,
+        "damage_taken": false
+    },
+    "decision": "✅ 安全巡航：維持紀律，順勢而為。",
+    "bg_color": "#006400"
+}
