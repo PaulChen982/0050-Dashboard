@@ -21,13 +21,13 @@ def run_analysis():
     try:
         ticker = yf.Ticker("0050.TW")
         df = ticker.history(period="6mo")
-        df = df.dropna(subset=['Close'])
+        df = df.dropna(subset=['Close']) # 強制過濾非開盤日的空值
         
         if not df.empty:
             df['20MA'] = df['Close'].rolling(window=20).mean()
             valid_ma_df = df.dropna(subset=['20MA'])
             
-            # 【完美優化】：抓取資料表最後一筆的「真實日期」
+            # 精確紀錄資料表裡最後一筆真實開盤的「真實交易日」
             last_trading_date = df.index[-1].strftime('%Y-%m-%d')
             
             current_price = float(df['Close'].iloc[-1])
@@ -40,7 +40,7 @@ def run_analysis():
     except Exception as e:
         print(f"數據抓取異常: {e}")
 
-    # 這裡的 True/False 代表總經大環境的狀態，需人工偶爾關注並修改
+    # 模擬大環境指標（目前設定觸發5項共80分，大環境改善時可手動在此調整 True/False）
     signals = {"US_Yield_Inversion": True, "TW_Foreign_Short": True, "TW_Margin_Overheat": False,
                "US_Speculative_Crash": True, "US_Valuation_Bubble": True, "TW_Tech_Divergence": True}
     
@@ -50,23 +50,33 @@ def run_analysis():
     trend_broken = bool(current_price < ma20) if fetch_success else False
     damage_taken = bool(drawdown_pct >= 7.0) if fetch_success else False
 
-    # 嚴格分層的白話決策邏輯
+    # 嚴格分層、邏輯閉環的白話決策系統
     if not fetch_success:
         decision, bg_color, shadow_color = "⚠️ 抓不到資料，可能網路卡卡的，晚點再試試看", "#374151", "rgba(55, 65, 81, 0.5)"
+    
+    # 狀態 1：環境極惡劣 + 股價破線 + 實質回撤高 = 全面出清
     elif env_risk and trend_broken and damage_taken:
         decision, bg_color, shadow_color = "🚨 危險！強烈建議先跑：市場全面轉弱，先賣出保留現金，等穩定了再說！", "#991B1B", "rgba(153, 27, 27, 0.5)"
+    
+    # 狀態 2：環境極惡劣 (85分以上) 但股價還在撐 = 停止買進，盯緊防線
     elif env_risk:
         decision, bg_color, shadow_color = "⚠️ 大環境非常惡劣：市場隨時有雪崩風險！絕對不要再加碼，盯緊月線準備閃人！", "#B45309", "rgba(180, 83, 9, 0.5)"
+    
+    # 狀態 3：實質破線或回撤過深 = 走勢轉弱，先停看聽
     elif trend_broken or damage_taken:
         decision, bg_color, shadow_color = "👀 價格走勢轉弱：已經跌破重要支撐，先停看聽，不要急著伸手接刀。", "#4B5563", "rgba(75, 85, 99, 0.5)"
+    
+    # 狀態 4：大環境風險偏高 (70~84分)，但 0050 股價仍健全踩穩 = 警訊浮現，繼續抱股
     elif risk_score >= 70:
         decision, bg_color, shadow_color = "🟡 警訊浮現、支撐仍在：外圍風向開始變了（風險達80分），好在 0050 股價還踩得很穩。不用嚇自己，繼續抱著觀察！", "#D97706", "rgba(217, 119, 6, 0.5)"
+    
+    # 狀態 5：內外指標皆處於安全水域
     else:
         decision, bg_color, shadow_color = "✅ 盤勢非常健康：內外指標都很安全，沒有明顯風險，安心抱著就好！", "#166534", "rgba(22, 101, 52, 0.5)"
 
     snapshot = {
         "update_time": update_time_str,
-        "last_trading_date": last_trading_date, # 加入真實交易日
+        "last_trading_date": last_trading_date,
         "price_data": {"current_price": round(current_price, 2), "ma20": round(ma20, 2), 
                        "high_water_mark": round(high_water_mark, 2), "drawdown_pct": round(drawdown_pct, 2)},
         "risk_score": risk_score,
