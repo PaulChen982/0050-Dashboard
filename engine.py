@@ -44,17 +44,17 @@ def run_analysis():
     trend_broken = bool(current_price < ma20) if fetch_success else False
     damage_taken = bool(drawdown_pct >= 7.0) if fetch_success else False
 
-    # 調整為更具實戰指導意義的行動標語
+    # 【全面白話文修改：決策指令】
     if not fetch_success:
-        decision, bg_color, shadow_color = "⚠️ 數據庫連線異常，等待系統修復中", "#374151", "rgba(55, 65, 81, 0.5)"
+        decision, bg_color, shadow_color = "⚠️ 抓不到資料，可能網路卡卡的，晚點再試試看", "#374151", "rgba(55, 65, 81, 0.5)"
     elif env_risk and trend_broken and damage_taken:
-        decision, bg_color, shadow_color = "🚨 風控全面觸發：建議全數出清避險，靜待市場落底", "#991B1B", "rgba(153, 27, 27, 0.5)"
+        decision, bg_color, shadow_color = "🚨 危險！強烈建議先跑：市場全面轉弱，先賣出保留現金，等穩定了再說！", "#991B1B", "rgba(153, 27, 27, 0.5)"
     elif env_risk:
-        decision, bg_color, shadow_color = "⚠️ 環境風險偏高：建議停止加碼，嚴格守住月線支撐", "#B45309", "rgba(180, 83, 9, 0.5)"
+        decision, bg_color, shadow_color = "⚠️ 大環境不太妙：先別急著買，盯緊月線，如果跌破就準備閃人！", "#B45309", "rgba(180, 83, 9, 0.5)"
     elif trend_broken or damage_taken:
-        decision, bg_color, shadow_color = "👀 價格高檔震盪：趨勢出現轉弱訊號，維持觀察不躁進", "#4B5563", "rgba(75, 85, 99, 0.5)"
+        decision, bg_color, shadow_color = "👀 稍微轉弱囉：跌破重要支撐了，先停看聽，不要急著加碼。", "#4B5563", "rgba(75, 85, 99, 0.5)"
     else:
-        decision, bg_color, shadow_color = "✅ 風險狀態安全：目前趨勢健全，維持既定投資紀律", "#166534", "rgba(22, 101, 52, 0.5)"
+        decision, bg_color, shadow_color = "✅ 盤勢很健康：目前沒什麼大風險，安心抱著就好！", "#166534", "rgba(22, 101, 52, 0.5)"
 
     snapshot = {
         "update_time": update_time_str,
