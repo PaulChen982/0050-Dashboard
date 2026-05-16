@@ -37,11 +37,9 @@ else:
     with open(JSON_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)
         
-    # 防止舊版 JSON 尚未更新時找不到 last_trading_date 報錯
     trading_date = data.get('last_trading_date', '更新中...')
 
     st.markdown("<div class='dashboard-title'>📊 0050 每日風險快篩</div>", unsafe_allow_html=True)
-    # 【完美優化】：清楚標示股價的真實日期
     st.markdown(f"<div class='update-time'>系統結算時間：{data['update_time']} ｜ 📊 股價基準日：<span class='highlight-date'>{trading_date}</span></div>", unsafe_allow_html=True)
     
     col1, col2 = st.columns([1.2, 1], gap="large")
@@ -55,6 +53,7 @@ else:
         
         st.markdown("<br><h4 style='color: #FFFFFF; font-weight: 600; margin-bottom: 15px;'>🛡️ 三大危險訊號檢查</h4>", unsafe_allow_html=True)
         
+        # 封裝一體化的數據對比面板函數
         def check_status(is_triggered, title, description, baseline_text, current_text):
             icon = "🔴" if is_triggered else "🟢"
             color = "#EF4444" if is_triggered else "#10B981"
