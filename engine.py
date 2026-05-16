@@ -19,13 +19,10 @@ def run_analysis():
     try:
         ticker = yf.Ticker("0050.TW")
         df = ticker.history(period="6mo")
-        
-        # 【關鍵修復】：強制剔除所有收盤價是 NaN 的無效資料 (例如週末)
         df = df.dropna(subset=['Close'])
         
         if not df.empty:
             df['20MA'] = df['Close'].rolling(window=20).mean()
-            # 確保 MA20 也是乾淨的數字
             valid_ma_df = df.dropna(subset=['20MA'])
             
             current_price = float(df['Close'].iloc[-1])
@@ -33,13 +30,11 @@ def run_analysis():
             high_water_mark = float(df['Close'].max())
             drawdown_pct = float(((high_water_mark - current_price) / high_water_mark) * 100) if high_water_mark > 0 else 0.0
             
-            # 二次防呆，確保沒有意外的 nan
             if not math.isnan(current_price) and not math.isnan(ma20):
                 fetch_success = True
     except Exception as e:
-        print(f"抓取數據失敗: {e}")
+        print(f"數據抓取異常: {e}")
 
-    # 模擬環境指標 (實務可串接爬蟲)
     signals = {"US_Yield_Inversion": True, "TW_Foreign_Short": True, "TW_Margin_Overheat": False,
                "US_Speculative_Crash": True, "US_Valuation_Bubble": True, "TW_Tech_Divergence": True}
     
@@ -49,17 +44,17 @@ def run_analysis():
     trend_broken = bool(current_price < ma20) if fetch_success else False
     damage_taken = bool(drawdown_pct >= 7.0) if fetch_success else False
 
-    # 專業色票設定
+    # 調整為更具實戰指導意義的行動標語
     if not fetch_success:
-        decision, bg_color, shadow_color = "⚠️ 數據庫連線異常，等待修復中", "#374151", "rgba(55, 65, 81, 0.5)"
+        decision, bg_color, shadow_color = "⚠️ 數據庫連線異常，等待系統修復中", "#374151", "rgba(55, 65, 81, 0.5)"
     elif env_risk and trend_broken and damage_taken:
-        decision, bg_color, shadow_color = "🚨 核彈警報：全數出清，滿手現金避險", "#991B1B", "rgba(153, 27, 27, 0.5)"
+        decision, bg_color, shadow_color = "🚨 風控全面觸發：建議全數出清避險，靜待市場落底", "#991B1B", "rgba(153, 27, 27, 0.5)"
     elif env_risk:
-        decision, bg_color, shadow_color = "⚠️ 戰術減碼：停止買進，嚴守支撐", "#B45309", "rgba(180, 83, 9, 0.5)"
+        decision, bg_color, shadow_color = "⚠️ 環境風險偏高：建議停止加碼，嚴格守住月線支撐", "#B45309", "rgba(180, 83, 9, 0.5)"
     elif trend_broken or damage_taken:
-        decision, bg_color, shadow_color = "👀 技術洗盤：暫不動作，持續觀察", "#4B5563", "rgba(75, 85, 99, 0.5)"
+        decision, bg_color, shadow_color = "👀 價格高檔震盪：趨勢出現轉弱訊號，維持觀察不躁進", "#4B5563", "rgba(75, 85, 99, 0.5)"
     else:
-        decision, bg_color, shadow_color = "✅ 安全巡航：維持紀律，順勢而為", "#166534", "rgba(22, 101, 52, 0.5)"
+        decision, bg_color, shadow_color = "✅ 風險狀態安全：目前趨勢健全，維持既定投資紀律", "#166534", "rgba(22, 101, 52, 0.5)"
 
     snapshot = {
         "update_time": update_time_str,
