@@ -1,10 +1,10 @@
 {
-    "update_time": "2026-05-16 11:17:54",
+    "update_time": "2026-05-16 11:33:09",
     "price_data": {
-        "current_price": NaN,
-        "ma20": NaN,
+        "current_price": 96.05,
+        "ma20": 91.68,
         "high_water_mark": 97.7,
-        "drawdown_pct": NaN
+        "drawdown_pct": 1.69
     },
     "risk_score": 80,
     "locks": {
@@ -12,6 +12,7 @@
         "trend_broken": false,
         "damage_taken": false
     },
-    "decision": "✅ 安全巡航：維持紀律，順勢而為。",
-    "bg_color": "#006400"
+    "decision": "✅ 安全巡航：維持紀律，順勢而為",
+    "bg_color": "#166534",
+    "shadow_color": "rgba(22, 101, 52, 0.5)"
 }
