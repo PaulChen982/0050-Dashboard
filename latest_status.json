@@ -1,5 +1,5 @@
 {
-    "update_time": "2026-05-16 11:33:09",
+    "update_time": "2026-05-16 11:40:27",
     "price_data": {
         "current_price": 96.05,
         "ma20": 91.68,
@@ -12,7 +12,7 @@
         "trend_broken": false,
         "damage_taken": false
     },
-    "decision": "✅ 安全巡航：維持紀律，順勢而為",
+    "decision": "✅ 盤勢很健康：目前沒什麼大風險，安心抱著就好！",
     "bg_color": "#166534",
     "shadow_color": "rgba(22, 101, 52, 0.5)"
 }
