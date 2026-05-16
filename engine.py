@@ -19,11 +19,15 @@ def run_analysis():
     fetch_success = False
 
     try:
-        # 【核心修復】：改用 yf.download 繞過 Yahoo Finance 周末 Chart API 的快取 Bug
+        # 下載歷史資料庫
         df = yf.download("0050.TW", period="6mo")
         
         if not df.empty:
-            # 關鍵邏輯：yf.download 的 'Adj Close' 才是經除權息修正後的「還原收盤價」
+            # 【終極核心修復】：如果欄位是新版的多層結構，強制降維扁平化，徹底根絕 KeyError
+            if isinstance(df.columns, pd.MultiIndex):
+                df.columns = df.columns.get_level_values(0)
+            
+            # 確保精確採用還原收盤價
             if 'Adj Close' in df.columns:
                 df['Close'] = df['Adj Close']
             
@@ -33,7 +37,7 @@ def run_analysis():
                 df['20MA'] = df['Close'].rolling(window=20).mean()
                 valid_ma_df = df.dropna(subset=['20MA'])
                 
-                # 精確紀錄真實開盤的最後一個交易日 (這下周末也能精確抓到週五了)
+                # 紀錄資料庫中最後一筆有效的交易日期 (週五資料完美歸位)
                 last_trading_date = df.index[-1].strftime('%Y-%m-%d')
                 
                 current_price = float(df['Close'].iloc[-1])
@@ -46,7 +50,7 @@ def run_analysis():
     except Exception as e:
         print(f"數據抓取異常: {e}")
 
-    # 模擬大環境指標 (大環境改善時可在此手動調整 True/False)
+    # 模擬大環境指標
     signals = {"US_Yield_Inversion": True, "TW_Foreign_Short": True, "TW_Margin_Overheat": False,
                "US_Speculative_Crash": True, "US_Valuation_Bubble": True, "TW_Tech_Divergence": True}
     
@@ -56,9 +60,9 @@ def run_analysis():
     trend_broken = bool(current_price < ma20) if fetch_success else False
     damage_taken = bool(drawdown_pct >= 7.0) if fetch_success else False
 
-    # 嚴格分層、邏輯閉環的白話決策系統
+    # 決策橫幅文字與燈號
     if not fetch_success:
-        decision, bg_color, shadow_color = "⚠️ 抓不到資料，可能網路卡卡的，晚點再試試看", "#374151", "rgba(55, 65, 81, 0.5)"
+        decision, bg_color, shadow_color = "⚠️ 數據格式同步異常，等待雲端修正中", "#374151", "rgba(55, 65, 81, 0.5)"
     elif env_risk and trend_broken and damage_taken:
         decision, bg_color, shadow_color = "🚨 危險！強烈建議先跑：市場全面轉弱，先賣出保留現金，等穩定了再說！", "#991B1B", "rgba(153, 27, 27, 0.5)"
     elif env_risk:
