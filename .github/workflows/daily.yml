@@ -5,7 +5,6 @@ on:
     - cron: '0 9 * * 1-5'
   workflow_dispatch:
 
-# 新增這一行：強制賦予機器人寫入資料的權限
 permissions:
   contents: write
 
@@ -14,11 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        # 解決黃色警告：升級到 v4
         uses: actions/checkout@v4
 
       - name: Set up Python
-        # 解決黃色警告：升級到 v5
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
@@ -35,6 +32,6 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add latest_status.json
+          git add latest_status.json || true
           git commit -m "🤖 自動更新盤後數據" || echo "無資料變更"
           git push
