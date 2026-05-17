@@ -37,7 +37,7 @@ def run_analysis():
                 df['20MA'] = df['Close'].rolling(window=20).mean()
                 valid_ma_df = df.dropna(subset=['20MA'])
                 
-                # 紀錄資料庫中最後一筆有效的交易日期 (週五資料完美歸位)
+                # 紀錄資料庫中最後一筆有效的交易日期
                 last_trading_date = df.index[-1].strftime('%Y-%m-%d')
                 
                 current_price = float(df['Close'].iloc[-1])
@@ -68,25 +68,4 @@ def run_analysis():
     elif env_risk:
         decision, bg_color, shadow_color = "⚠️ 大環境非常惡劣：市場隨時有雪崩風險！絕對不要再加碼，盯緊月線準備閃人！", "#B45309", "rgba(180, 83, 9, 0.5)"
     elif trend_broken or damage_taken:
-        decision, bg_color, shadow_color = "👀 價格走勢轉弱：已經跌破重要支撐，先停看聽，不要急著伸手接刀。", "#4B5563", "rgba(75, 85, 99, 0.5)"
-    elif risk_score >= 70:
-        decision, bg_color, shadow_color = "🟡 警訊浮現、支撐仍在：外圍風向開始變了（風險達80分），好在 0050 股價還踩得很穩。不用嚇自己，繼續抱著觀察！", "#D97706", "rgba(217, 119, 6, 0.5)"
-    else:
-        decision, bg_color, shadow_color = "✅ 盤勢非常健康：內外指標都很安全，沒有明顯風險，安心抱著就好！", "#166534", "rgba(22, 101, 52, 0.5)"
-
-    snapshot = {
-        "update_time": update_time_str,
-        "last_trading_date": last_trading_date,
-        "price_data": {"current_price": round(current_price, 2), "ma20": round(ma20, 2), 
-                       "high_water_mark": round(high_water_mark, 2), "drawdown_pct": round(drawdown_pct, 2)},
-        "risk_score": risk_score,
-        "locks": {"env_risk": env_risk, "trend_broken": trend_broken, "damage_taken": damage_taken},
-        "decision": decision, "bg_color": bg_color, "shadow_color": shadow_color
-    }
-
-    with open("latest_status.json", "w", encoding="utf-8") as f:
-        json.dump(snapshot, f, ensure_ascii=False, indent=4)
-    print("分析完成並成功寫入 JSON！")
-
-if __name__ == "__main__":
-    run_analysis()
+        decision, bg_color, shadow_color = "👀 價格走勢轉弱：已經跌破重要支撐，先停看聽，不要急著伸手接刀。", "#4B5
