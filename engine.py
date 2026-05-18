@@ -74,7 +74,8 @@ def run_analysis():
         us10y = yf.download("^TNX", period="1mo", progress=False, multi_level_index=False)
         us3m = yf.download("^IRX", period="1mo", progress=False, multi_level_index=False)
         if not us10y.empty and not us3m.empty:
-            signals["US_Yield_Inversion"] = float(us10y['Close'].iloc[-1]) < float(us3m['Close'].iloc[-1])
+            # 【修復】加入 bool() 強制轉型
+            signals["US_Yield_Inversion"] = bool(float(us10y['Close'].iloc[-1]) < float(us3m['Close'].iloc[-1]))
 
         # 指標 2: 美股估值過高 (S&P 500 乖離率 > 15%)
         sp500 = yf.download("^GSPC", period="1y", progress=False, multi_level_index=False)
@@ -82,13 +83,13 @@ def run_analysis():
             sp500['200MA'] = sp500['Close'].rolling(window=200).mean()
             if not pd.isna(sp500['200MA'].iloc[-1]):
                 bias_ratio = (sp500['Close'].iloc[-1] / sp500['200MA'].iloc[-1]) - 1
-                signals["US_Valuation_Bubble"] = bias_ratio > 0.15
+                signals["US_Valuation_Bubble"] = bool(bias_ratio > 0.15)
 
         # 指標 3: 投機市場過熱 (Nasdaq RSI > 75)
         ndx = yf.download("^IXIC", period="3mo", progress=False, multi_level_index=False)
         if not ndx.empty:
             ndx['RSI'] = calculate_rsi(ndx)
-            signals["US_Speculative_Crash"] = float(ndx['RSI'].iloc[-1]) > 75.0 if not pd.isna(ndx['RSI'].iloc[-1]) else False
+            signals["US_Speculative_Crash"] = bool(float(ndx['RSI'].iloc[-1]) > 75.0) if not pd.isna(ndx['RSI'].iloc[-1]) else False
 
         # 指標 4, 5, 6: 台股大盤連動性與籌碼 (Volatility & Volume Proxy)
         twii = yf.download("^TWII", period="3mo", progress=False, multi_level_index=False)
@@ -97,16 +98,16 @@ def run_analysis():
             twii['Daily_Return'] = twii['Close'].pct_change()
             twii['Volatility'] = twii['Daily_Return'].rolling(window=10).std() * np.sqrt(252) # 年化波動度
             
-            # 台股技術背離：大盤跌破月線但短線震幅劇烈
-            signals["TW_Tech_Divergence"] = (float(twii['Close'].iloc[-1]) < float(twii['Close'].rolling(window=20).mean().iloc[-1]))
+            # 台股技術背離：大盤跌破月線
+            signals["TW_Tech_Divergence"] = bool(float(twii['Close'].iloc[-1]) < float(twii['Close'].rolling(window=20).mean().iloc[-1]))
             
             # 外資/機構恐慌指標：短期波動率飆升超過 20%
-            signals["TW_Foreign_Short"] = float(twii['Volatility'].iloc[-1]) > 0.20 if not pd.isna(twii['Volatility'].iloc[-1]) else False
+            signals["TW_Foreign_Short"] = bool(float(twii['Volatility'].iloc[-1]) > 0.20) if not pd.isna(twii['Volatility'].iloc[-1]) else False
             
             # 散戶融資/爆量殺盤：成交量 > 20日均量 1.5倍 且 當日下跌
             vol_surge = float(twii['Volume'].iloc[-1]) > (float(twii['20MA_Vol'].iloc[-1]) * 1.5)
             is_down = float(twii['Daily_Return'].iloc[-1]) < 0
-            signals["TW_Margin_Overheat"] = vol_surge and is_down
+            signals["TW_Margin_Overheat"] = bool(vol_surge and is_down)
 
     except Exception as e:
         print(f"指標自動計算發生異常: {e}")
@@ -144,7 +145,7 @@ def run_analysis():
         "risk_score": risk_score,
         "locks": {"env_risk": env_risk, "trend_broken": trend_broken, "damage_taken": damage_taken},
         "decision": decision, "bg_color": bg_color, "shadow_color": shadow_color,
-        "indicator_status": signals  # 可供前端未來擴充詳細燈號
+        "indicator_status": signals
     }
 
     with open("latest_status.json", "w", encoding="utf-8") as f:
