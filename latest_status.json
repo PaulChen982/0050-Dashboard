@@ -1,11 +1,11 @@
 {
-    "update_time": "2026-05-16 12:13:12",
-    "last_trading_date": "未知",
+    "update_time": "2026-05-18 10:00:57",
+    "last_trading_date": "2026-05-18",
     "price_data": {
-        "current_price": 0.0,
-        "ma20": 0.0,
-        "high_water_mark": 0.0,
-        "drawdown_pct": 0.0
+        "current_price": 93.9,
+        "ma20": 92.68,
+        "high_water_mark": 97.7,
+        "drawdown_pct": 3.89
     },
     "risk_score": 80,
     "locks": {
@@ -13,7 +13,7 @@
         "trend_broken": false,
         "damage_taken": false
     },
-    "decision": "⚠️ 抓不到資料，可能網路卡卡的，晚點再試試看",
-    "bg_color": "#374151",
-    "shadow_color": "rgba(55, 65, 81, 0.5)"
+    "decision": "🟡 警訊浮現、支撐仍在：外圍風向開始變了（風險達80分），好在 0050 股價還踩得很穩。不用嚇自己，繼續抱著觀察！",
+    "bg_color": "#D97706",
+    "shadow_color": "rgba(217, 119, 6, 0.5)"
 }
