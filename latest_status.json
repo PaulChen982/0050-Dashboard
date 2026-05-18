@@ -1,19 +1,27 @@
 {
-    "update_time": "2026-05-18 10:00:57",
+    "update_time": "2026-05-18 10:11:10",
     "last_trading_date": "2026-05-18",
     "price_data": {
-        "current_price": 93.9,
-        "ma20": 92.68,
+        "current_price": 94.05,
+        "ma20": 92.69,
         "high_water_mark": 97.7,
-        "drawdown_pct": 3.89
+        "drawdown_pct": 3.74
     },
-    "risk_score": 80,
+    "risk_score": 0,
     "locks": {
         "env_risk": false,
         "trend_broken": false,
         "damage_taken": false
     },
-    "decision": "🟡 警訊浮現、支撐仍在：外圍風向開始變了（風險達80分），好在 0050 股價還踩得很穩。不用嚇自己，繼續抱著觀察！",
-    "bg_color": "#D97706",
-    "shadow_color": "rgba(217, 119, 6, 0.5)"
+    "decision": "✅ 盤勢非常健康：內外指標都很安全，沒有明顯風險，安心抱著就好！",
+    "bg_color": "#166534",
+    "shadow_color": "rgba(22, 101, 52, 0.5)",
+    "indicator_status": {
+        "US_Yield_Inversion": false,
+        "TW_Foreign_Short": false,
+        "TW_Margin_Overheat": false,
+        "US_Speculative_Crash": false,
+        "US_Valuation_Bubble": false,
+        "TW_Tech_Divergence": false
+    }
 }
