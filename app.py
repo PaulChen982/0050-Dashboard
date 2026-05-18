@@ -96,9 +96,6 @@ else:
 
         st.markdown("<br><hr style='border-color: #374151;'><br>", unsafe_allow_html=True)
 
-        # ==========================================
-        # 新增區塊：六大指標明細
-        # ==========================================
         st.markdown("<h4 style='color: #FFFFFF; font-weight: 600; margin-bottom: 15px;'>🌐 六大總經與籌碼指標 (總分計算來源)</h4>", unsafe_allow_html=True)
         
         if "raw_indicators" in data:
@@ -140,7 +137,6 @@ else:
             ), unsafe_allow_html=True)
 
     with col2:
-        # 在側邊釘選顯示大大的當前風險總分
         st.markdown("<h4 style='text-align: center; color: #FFFFFF; font-weight: 600;'>🎯 今天的風險分數</h4>", unsafe_allow_html=True)
         st.markdown(f"""
             <div class='score-card'>
@@ -148,7 +144,10 @@ else:
                 <p style='color: #9CA3AF; font-size: 1.1rem; margin-top: 10px; letter-spacing: 1px;'>(由下方六大指標動態加總，滿分 100 分)</p>
             </div>
         """, unsafe_allow_html=True)
-        st.progress(data['risk_score'] / 100)
+        
+        # 【核心優化】強制將進度條數值限制在 0.0 到 1.0 之間，防止 UI 崩潰
+        safe_progress = min(max(data['risk_score'] / 100.0, 0.0), 1.0)
+        st.progress(safe_progress)
         
     st.markdown("<br>", unsafe_allow_html=True)
     
