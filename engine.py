@@ -32,15 +32,16 @@ def run_analysis():
     
     signals = {k: False for k in WEIGHTS.keys()}
     
-    # 【新增】用來記錄原始數據以供前端網頁顯示
     raw_data = {
         "us10y": 0.0, "us3m": 0.0, "sp500_bias": 0.0, "ndx_rsi": 0.0,
         "twii_close": 0.0, "twii_20ma": 0.0, "twii_volatility": 0.0, 
         "twii_vol_ratio": 0.0, "twii_is_down": False
     }
 
+    # ==========================================
+    # 模組 1: 核心股價防護 (獨立 Try-Except)
+    # ==========================================
     try:
-        # --- 0050 股價數據 ---
         df_0050 = yf.download("0050.TW", period="6mo", multi_level_index=False)
         if not df_0050.empty:
             df_0050 = df_0050.copy()
@@ -60,15 +61,25 @@ def run_analysis():
                 
                 if not math.isnan(current_price) and not math.isnan(ma20):
                     fetch_success = True
+    except Exception as e:
+        print(f"0050 核心數據抓取失敗: {e}")
 
-        # --- 總經指標數據 (並儲存原始數值) ---
+    # ==========================================
+    # 模組 2: 總經指標防護 (各別獨立 Try-Except，避免火燒連環船)
+    # ==========================================
+    
+    # [美債]
+    try:
         us10y = yf.download("^TNX", period="1mo", progress=False, multi_level_index=False)
         us3m = yf.download("^IRX", period="1mo", progress=False, multi_level_index=False)
         if not us10y.empty and not us3m.empty:
             raw_data["us10y"] = round(float(us10y['Close'].iloc[-1]), 3)
             raw_data["us3m"] = round(float(us3m['Close'].iloc[-1]), 3)
             signals["US_Yield_Inversion"] = bool(raw_data["us10y"] < raw_data["us3m"])
+    except Exception as e: print(f"美債抓取失敗: {e}")
 
+    # [美股 S&P 500]
+    try:
         sp500 = yf.download("^GSPC", period="1y", progress=False, multi_level_index=False)
         if not sp500.empty:
             sp500['200MA'] = sp500['Close'].rolling(window=200).mean()
@@ -76,14 +87,20 @@ def run_analysis():
                 bias_ratio = (float(sp500['Close'].iloc[-1]) / float(sp500['200MA'].iloc[-1])) - 1
                 raw_data["sp500_bias"] = round(bias_ratio * 100, 2)
                 signals["US_Valuation_Bubble"] = bool(bias_ratio > 0.15)
+    except Exception as e: print(f"S&P500抓取失敗: {e}")
 
+    # [美股 Nasdaq]
+    try:
         ndx = yf.download("^IXIC", period="3mo", progress=False, multi_level_index=False)
         if not ndx.empty:
             ndx['RSI'] = calculate_rsi(ndx)
             if not pd.isna(ndx['RSI'].iloc[-1]):
                 raw_data["ndx_rsi"] = round(float(ndx['RSI'].iloc[-1]), 2)
                 signals["US_Speculative_Crash"] = bool(raw_data["ndx_rsi"] > 75.0)
+    except Exception as e: print(f"Nasdaq抓取失敗: {e}")
 
+    # [台股大盤]
+    try:
         twii = yf.download("^TWII", period="3mo", progress=False, multi_level_index=False)
         if not twii.empty:
             twii['20MA_Vol'] = twii['Volume'].rolling(window=20).mean()
@@ -93,7 +110,10 @@ def run_analysis():
             twii_close = float(twii['Close'].iloc[-1])
             twii_20ma = float(twii['Close'].rolling(window=20).mean().iloc[-1])
             volatility = float(twii['Volatility'].iloc[-1])
-            vol_ratio = float(twii['Volume'].iloc[-1]) / float(twii['20MA_Vol'].iloc[-1]) if float(twii['20MA_Vol'].iloc[-1]) > 0 else 0
+            
+            # 防呆：避免成交量 20MA 為 0 導致除以零的錯誤
+            avg_vol = float(twii['20MA_Vol'].iloc[-1])
+            vol_ratio = float(twii['Volume'].iloc[-1]) / avg_vol if avg_vol > 0 else 0
             is_down = float(twii['Daily_Return'].iloc[-1]) < 0
             
             raw_data["twii_close"] = round(twii_close, 2)
@@ -105,17 +125,18 @@ def run_analysis():
             signals["TW_Tech_Divergence"] = bool(twii_close < twii_20ma)
             signals["TW_Foreign_Short"] = bool(volatility > 0.20) if not pd.isna(volatility) else False
             signals["TW_Margin_Overheat"] = bool(vol_ratio > 1.5 and is_down)
+    except Exception as e: print(f"台股大盤抓取失敗: {e}")
 
-    except Exception as e:
-        print(f"指標自動計算發生異常: {e}")
-
+    # ==========================================
+    # 結算與輸出
+    # ==========================================
     risk_score = int(sum(WEIGHTS[k] for k, v in signals.items() if v))
     env_risk = bool(risk_score >= 85)
     trend_broken = bool(current_price < ma20) if fetch_success else False
     damage_taken = bool(drawdown_pct >= 7.0) if fetch_success else False
 
     if not fetch_success:
-        decision, bg_color, shadow_color = "⚠️ 數據格式同步異常，等待雲端修正中", "#374151", "rgba(55, 65, 81, 0.5)"
+        decision, bg_color, shadow_color = "⚠️ 數據庫連線異常，暫停風險判定", "#374151", "rgba(55, 65, 81, 0.5)"
     elif env_risk and trend_broken and damage_taken:
         decision, bg_color, shadow_color = "🚨 危險！強烈建議先跑：市場全面轉弱，先賣出保留現金，等穩定了再說！", "#991B1B", "rgba(153, 27, 27, 0.5)"
     elif env_risk:
@@ -138,7 +159,7 @@ def run_analysis():
         "locks": {"env_risk": env_risk, "trend_broken": trend_broken, "damage_taken": damage_taken},
         "decision": decision, "bg_color": bg_color, "shadow_color": shadow_color,
         "indicator_status": signals,
-        "raw_indicators": raw_data # 將原始數據傳給前端
+        "raw_indicators": raw_data
     }
 
     with open("latest_status.json", "w", encoding="utf-8") as f:
