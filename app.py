@@ -4,7 +4,6 @@ import os
 
 st.set_page_config(page_title="0050 每日風險快篩", page_icon="📊", layout="wide", initial_sidebar_state="collapsed")
 
-# 高階自訂 CSS 樣式排版
 st.markdown("""
 <style>
     .stApp { background-color: #0E1117; color: #E5E7EB; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
@@ -52,9 +51,6 @@ else:
         m2.markdown(f"<div class='metric-card'><div class='metric-title'>月線 (20MA)</div><div class='metric-value'>{data['price_data']['ma20']}</div></div>", unsafe_allow_html=True)
         m3.markdown(f"<div class='metric-card'><div class='metric-title'>最近的高點</div><div class='metric-value'>{data['price_data']['high_water_mark']}</div></div>", unsafe_allow_html=True)
         
-        st.markdown("<br><h4 style='color: #FFFFFF; font-weight: 600; margin-bottom: 15px;'>🛡️ 三大危險訊號檢查</h4>", unsafe_allow_html=True)
-        
-        # 封裝一體化的數據對比面板函數
         def check_status(is_triggered, title, description, baseline_text, current_text):
             icon = "🔴" if is_triggered else "🟢"
             color = "#EF4444" if is_triggered else "#10B981"
@@ -74,37 +70,82 @@ else:
                 </div>
             </div>
             """
-            
+
+        st.markdown("<br><h4 style='color: #FFFFFF; font-weight: 600; margin-bottom: 15px;'>🛡️ 核心三大危險訊號 (系統決策鎖)</h4>", unsafe_allow_html=True)
+        
         st.markdown(check_status(
             data['locks']['env_risk'], 
-            "環境風險過高", 
-            "綜合評估外資籌碼與國際總經等6項核心指標。達85分代表發生系統性崩跌的機率極高。",
-            "≥ 85 分",
-            f"{data['risk_score']} 分"
+            "第一鎖：環境風險過高", 
+            "由下方的 6 大總經與籌碼指標總分判定。達 85 分代表發生系統性崩跌的機率極高。",
+            "總分 ≥ 85 分", f"{data['risk_score']} 分"
         ), unsafe_allow_html=True)
         
         st.markdown(check_status(
             data['locks']['trend_broken'], 
-            "短期趨勢轉弱", 
-            "月線(20MA)為短線生命線。跌破代表近一個月買盤套牢，多頭趨勢轉弱，需提高警覺。",
-            f"低於 {data['price_data']['ma20']}",
-            f"{data['price_data']['current_price']}"
+            "第二鎖：短期趨勢轉弱", 
+            "0050 跌破 20 日均線，代表近一個月買盤套牢，多頭趨勢轉弱。",
+            f"低於 {data['price_data']['ma20']}", f"{data['price_data']['current_price']}"
         ), unsafe_allow_html=True)
         
         st.markdown(check_status(
             data['locks']['damage_taken'], 
-            "波段回檔過深", 
-            "0050正常洗盤震盪約在3~5%內。回檔一旦超過7%，通常代表市場引發實質恐慌與多殺多。",
-            "≥ 7.00 %",
-            f"{data['price_data']['drawdown_pct']} %"
+            "第三鎖：波段回檔過深", 
+            "0050 自近期最高點回檔一旦超過 7%，通常代表市場引發實質恐慌與多殺多。",
+            "跌幅 ≥ 7.00 %", f"{data['price_data']['drawdown_pct']} %"
         ), unsafe_allow_html=True)
 
+        st.markdown("<br><hr style='border-color: #374151;'><br>", unsafe_allow_html=True)
+
+        # ==========================================
+        # 新增區塊：六大指標明細
+        # ==========================================
+        st.markdown("<h4 style='color: #FFFFFF; font-weight: 600; margin-bottom: 15px;'>🌐 六大總經與籌碼指標 (總分計算來源)</h4>", unsafe_allow_html=True)
+        
+        if "raw_indicators" in data:
+            st.markdown(check_status(
+                data['indicator_status']['US_Yield_Inversion'],
+                "美債殖利率倒掛 (+15 分)", "10 年期公債殖利率低於 3 個月期，預示國際經濟衰退風險。",
+                "10年期 < 3個月期", f"10年: {data['raw_indicators']['us10y']}% | 3月: {data['raw_indicators']['us3m']}%"
+            ), unsafe_allow_html=True)
+            
+            st.markdown(check_status(
+                data['indicator_status']['US_Valuation_Bubble'],
+                "美股估值過高 (+10 分)", "S&P 500 指數偏離 200 日均線過大，有過熱回檔風險。",
+                "正乖離 > 15%", f"目前乖離: {data['raw_indicators']['sp500_bias']} %"
+            ), unsafe_allow_html=True)
+            
+            st.markdown(check_status(
+                data['indicator_status']['US_Speculative_Crash'],
+                "投機市場過熱 (+15 分)", "Nasdaq 指數 RSI 進入極度超買區，隨時可能反轉。",
+                "RSI > 75", f"RSI 數值: {data['raw_indicators']['ndx_rsi']}"
+            ), unsafe_allow_html=True)
+            
+            st.markdown(check_status(
+                data['indicator_status']['TW_Tech_Divergence'],
+                "台股技術背離 (+20 分)", "台股大盤跌破月線，代表整體市場趨勢轉弱。",
+                f"大盤低於 {data['raw_indicators']['twii_20ma']}", f"目前大盤: {data['raw_indicators']['twii_close']}"
+            ), unsafe_allow_html=True)
+            
+            st.markdown(check_status(
+                data['indicator_status']['TW_Foreign_Short'],
+                "大戶恐慌拋售 (+20 分)", "台股短期年化波動率飆升，顯示大戶籌碼鬆動或恐慌拋售。",
+                "波動率 > 20%", f"波動率: {data['raw_indicators']['twii_volatility']} %"
+            ), unsafe_allow_html=True)
+            
+            twii_down_text = "收跌" if data['raw_indicators']['twii_is_down'] else "未收跌"
+            st.markdown(check_status(
+                data['indicator_status']['TW_Margin_Overheat'],
+                "散戶爆量殺盤 (+20 分)", "台股成交量爆出 20 日均量的 1.5 倍以上，且當日收黑。",
+                "量增 > 1.5倍 且 收跌", f"量增 {data['raw_indicators']['twii_vol_ratio']}倍 | 今日{twii_down_text}"
+            ), unsafe_allow_html=True)
+
     with col2:
+        # 在側邊釘選顯示大大的當前風險總分
         st.markdown("<h4 style='text-align: center; color: #FFFFFF; font-weight: 600;'>🎯 今天的風險分數</h4>", unsafe_allow_html=True)
         st.markdown(f"""
             <div class='score-card'>
                 <p class='score-value' style='color: {data['bg_color']};'>{data['risk_score']}</p>
-                <p style='color: #9CA3AF; font-size: 1.1rem; margin-top: 10px; letter-spacing: 1px;'>(滿分 100 分，越高越危險)</p>
+                <p style='color: #9CA3AF; font-size: 1.1rem; margin-top: 10px; letter-spacing: 1px;'>(由下方六大指標動態加總，滿分 100 分)</p>
             </div>
         """, unsafe_allow_html=True)
         st.progress(data['risk_score'] / 100)
