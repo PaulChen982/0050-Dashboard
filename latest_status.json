@@ -1,17 +1,17 @@
 {
-    "update_time": "2026-07-23 20:19:53",
-    "last_trading_date": "2026-07-23",
+    "update_time": "2026-07-24 20:14:51",
+    "last_trading_date": "2026-07-24",
     "price_data": {
-        "current_price": 103.9,
-        "ma20": 104.79,
+        "current_price": 101.7,
+        "ma20": 104.75,
         "high_water_mark": 110.48,
-        "drawdown_pct": 5.95
+        "drawdown_pct": 7.95
     },
     "risk_score": 40,
     "locks": {
         "env_risk": false,
         "trend_broken": true,
-        "damage_taken": false
+        "damage_taken": true
     },
     "decision": "👀 價格走勢轉弱：已經跌破重要支撐，先停看聽，不要急著伸手接刀。",
     "bg_color": "#4B5563",
@@ -25,14 +25,14 @@
         "TW_Tech_Divergence": true
     },
     "raw_indicators": {
-        "us10y": 4.657,
-        "us3m": 3.745,
-        "sp500_bias": 7.14,
-        "ndx_rsi": 46.76,
-        "twii_close": 44850.81,
-        "twii_20ma": 45301.33,
-        "twii_volatility": 43.65,
+        "us10y": 4.703,
+        "us3m": 3.8,
+        "sp500_bias": 5.8,
+        "ndx_rsi": 40.05,
+        "twii_close": 43654.84,
+        "twii_20ma": 45171.31,
+        "twii_volatility": 45.38,
         "twii_vol_ratio": 0.0,
-        "twii_is_down": false
+        "twii_is_down": true
     }
 }
