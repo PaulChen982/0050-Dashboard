@@ -1,11 +1,11 @@
 {
-    "update_time": "2026-08-19 19:18:10",
-    "last_trading_date": "2026-08-19",
+    "update_time": "2026-08-20 19:19:07",
+    "last_trading_date": "2026-08-20",
     "price_data": {
-        "current_price": 103.1,
-        "ma20": 102.37,
+        "current_price": 103.8,
+        "ma20": 102.46,
         "high_water_mark": 110.48,
-        "drawdown_pct": 6.68
+        "drawdown_pct": 6.04
     },
     "risk_score": 0,
     "locks": {
@@ -25,14 +25,14 @@
         "TW_Tech_Divergence": false
     },
     "raw_indicators": {
-        "us10y": 4.706,
-        "us3m": 3.705,
-        "sp500_bias": 8.73,
-        "ndx_rsi": 52.64,
-        "twii_close": 44719.35,
-        "twii_20ma": 44005.1,
-        "twii_volatility": 15.36,
+        "us10y": 4.653,
+        "us3m": 3.7,
+        "sp500_bias": 8.9,
+        "ndx_rsi": 52.91,
+        "twii_close": 44933.74,
+        "twii_20ma": 44095.8,
+        "twii_volatility": 15.22,
         "twii_vol_ratio": 0.0,
-        "twii_is_down": true
+        "twii_is_down": false
     }
 }
