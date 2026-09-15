@@ -1,38 +1,38 @@
 {
-    "update_time": "2026-09-15 00:43:26",
-    "last_trading_date": "2026-09-11",
+    "update_time": "2026-09-15 23:21:50",
+    "last_trading_date": "2026-09-15",
     "price_data": {
-        "current_price": 107.7,
-        "ma20": 106.58,
+        "current_price": 106.25,
+        "ma20": 106.67,
         "high_water_mark": 110.48,
-        "drawdown_pct": 2.51
+        "drawdown_pct": 3.83
     },
     "risk_score": 20,
     "locks": {
         "env_risk": false,
-        "trend_broken": false,
+        "trend_broken": true,
         "damage_taken": false
     },
-    "decision": "✅ 盤勢非常健康：內外指標都很安全，沒有明顯風險，安心抱著就好！",
-    "bg_color": "#166534",
-    "shadow_color": "rgba(22, 101, 52, 0.5)",
+    "decision": "👀 價格走勢轉弱：已經跌破重要支撐，先停看聽，不要急著伸手接刀。",
+    "bg_color": "#4B5563",
+    "shadow_color": "rgba(75, 85, 99, 0.5)",
     "indicator_status": {
         "US_Yield_Inversion": false,
-        "TW_Foreign_Short": true,
+        "TW_Foreign_Short": false,
         "TW_Margin_Overheat": false,
         "US_Speculative_Crash": false,
         "US_Valuation_Bubble": false,
-        "TW_Tech_Divergence": false
+        "TW_Tech_Divergence": true
     },
     "raw_indicators": {
-        "us10y": 4.949,
-        "us3m": 3.93,
-        "sp500_bias": 6.53,
-        "ndx_rsi": 50.23,
-        "twii_close": 46184.85,
-        "twii_20ma": 46025.29,
-        "twii_volatility": 20.31,
-        "twii_vol_ratio": 0.86,
+        "us10y": 5.0,
+        "us3m": 3.96,
+        "sp500_bias": 5.73,
+        "ndx_rsi": 45.43,
+        "twii_close": 45511.49,
+        "twii_20ma": 46035.7,
+        "twii_volatility": 17.97,
+        "twii_vol_ratio": 0.0,
         "twii_is_down": true
     }
 }
