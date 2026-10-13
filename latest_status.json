@@ -1,5 +1,5 @@
 {
-    "update_time": "2026-10-13 04:03:54",
+    "update_time": "2026-10-14 01:52:44",
     "last_trading_date": "2026-10-12",
     "price_data": {
         "current_price": 114.8,
@@ -25,14 +25,14 @@
         "TW_Tech_Divergence": false
     },
     "raw_indicators": {
-        "us10y": 5.24,
-        "us3m": 4.05,
-        "sp500_bias": 7.61,
-        "ndx_rsi": 57.5,
-        "twii_close": 49313.44,
-        "twii_20ma": 47687.85,
-        "twii_volatility": 15.93,
-        "twii_vol_ratio": 0.96,
+        "us10y": 5.219,
+        "us3m": 4.063,
+        "sp500_bias": 7.38,
+        "ndx_rsi": 55.65,
+        "twii_close": 49301.96,
+        "twii_20ma": 47793.78,
+        "twii_volatility": 15.81,
+        "twii_vol_ratio": 1.01,
         "twii_is_down": true
     }
 }
