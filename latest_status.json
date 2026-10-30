@@ -1,17 +1,17 @@
 {
-    "update_time": "2026-10-30 01:13:09",
-    "last_trading_date": "2026-10-28",
+    "update_time": "2026-10-31 00:54:31",
+    "last_trading_date": "2026-10-29",
     "price_data": {
-        "current_price": 108.65,
-        "ma20": 111.16,
+        "current_price": 107.25,
+        "ma20": 110.96,
         "high_water_mark": 116.5,
-        "drawdown_pct": 6.74
+        "drawdown_pct": 7.94
     },
     "risk_score": 40,
     "locks": {
         "env_risk": false,
         "trend_broken": true,
-        "damage_taken": false
+        "damage_taken": true
     },
     "decision": "👀 價格走勢轉弱：已經跌破重要支撐，先停看聽，不要急著伸手接刀。",
     "bg_color": "#4B5563",
@@ -25,14 +25,14 @@
         "TW_Tech_Divergence": true
     },
     "raw_indicators": {
-        "us10y": 4.999,
-        "us3m": 3.998,
-        "sp500_bias": 5.54,
-        "ndx_rsi": 43.35,
-        "twii_close": 47035.58,
-        "twii_20ma": 47930.33,
-        "twii_volatility": 26.18,
-        "twii_vol_ratio": 0.75,
-        "twii_is_down": false
+        "us10y": 4.954,
+        "us3m": 3.982,
+        "sp500_bias": 3.68,
+        "ndx_rsi": 34.44,
+        "twii_close": 46368.33,
+        "twii_20ma": 47847.51,
+        "twii_volatility": 25.46,
+        "twii_vol_ratio": 0.84,
+        "twii_is_down": true
     }
 }
